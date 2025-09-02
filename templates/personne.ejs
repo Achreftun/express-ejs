@@ -10,6 +10,16 @@
 <body>
   <h1>Gestion de personnes</h1>
   <h2>Ajouter une nouvelle personne</h2>
+  <ul>
+    <% if (erreurs) { %>
+    <%  erreurs.forEach(err => { %>
+    <li>
+      <%= err %>
+    </li>
+
+    <% }) %>
+    <% } %>
+  </ul>
   <form action="/personne" method="post">
     <div>
       <label for="nom">Nom</label>
@@ -32,11 +42,11 @@
   <h2>Liste des personnes</h2>
   <ul>
     <% personnes.forEach(p => { %>
-        <% let link=`/personne/${p.id}` %>
-        <li>
-            <%= `${p.prenom} ${p.nom}` %>
-            <a href="<%= link %>">supprimer</a>
-        </li>
+    <% let link=`/personne/${p.id}` %>
+    <li>
+      <%= `${p.prenom} ${p.nom}` %>
+      <a href="<%= link %>">supprimer</a>
+    </li>
     <%})%>
   </ul>
 </body>

@@ -1,9 +1,12 @@
 import express from 'express'
 import 'dotenv/config'
+
+
+import session from 'express-session'
 import personne from './routes/personne.route.js'
 import adresse from './routes/adresse.route.js'
-import session from 'express-session'
 
+// configurer yup
 
 const app = express()
 
@@ -17,6 +20,9 @@ app.use(session({
 
 // utiliser le middleware body-parser
 app.use(express.urlencoded())
+
+// configurer les ressources statiques
+// app.use(express.static('public'))
 
 
 // Mapping entre routes et le routeur

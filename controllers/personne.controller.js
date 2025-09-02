@@ -1,3 +1,25 @@
+import * as yup from 'yup'
+import { fr } from 'yup-locales'
+
+yup.setLocale(fr)
+
+const personneSchema = yup.object().shape({
+    nom: yup
+        .string()
+        .required()
+        .matches(/^[A-Z]{1}.{2,19}$/, "Le nom doit commencer par une majuscule et comporter entre 3 et 20 lettres"),
+    prenom: yup
+        .string()
+        .min(3, (args) => `Le prénom doit contenir au moins ${args.min} caractères, valeur saisie : ${args.value} `)
+        .max(20),
+    age: yup
+        .number()
+        .required()
+        .positive()
+
+})
+
+
 const personnes = [
     { id: 1, nom: "Wick", prenom: "John", age: 45 },
     { id: 2, nom: "Dalton", prenom: "Jack", age: 55 },
@@ -6,13 +28,29 @@ const personnes = [
 
 const showPersonnes = (req, res, next) => {
     res.render('personne', {
-        personnes
+        personnes,
+        erreurs: null
     })
 }
 const addPersonne = (req, res, next) => {
-    personnes.push(req.body)
-    req.session.firstname = req.body.prenom
-    res.redirect('/personne')
+
+    personneSchema
+        .validate(req.body, { abortEarly: false })
+        .then(() => {
+            personnes.push(req.body)
+            req.session.firstname = req.body.prenom
+            res.redirect('/personne')
+        })
+        .catch(err => {
+            console.log(err);
+
+            res.render('personne', {
+                erreurs: err.errors,
+                personnes
+            })
+        })
+
+
 
 }
 const deletePersonne = (req, res, next) => {
