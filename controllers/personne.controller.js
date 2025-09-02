@@ -1,7 +1,10 @@
 import * as yup from 'yup'
 import { fr } from 'yup-locales'
+import connection from '../config/db.js'
 
 yup.setLocale(fr)
+
+
 
 const personneSchema = yup.object().shape({
     nom: yup
@@ -20,17 +23,26 @@ const personneSchema = yup.object().shape({
 })
 
 
-const personnes = [
-    { id: 1, nom: "Wick", prenom: "John", age: 45 },
-    { id: 2, nom: "Dalton", prenom: "Jack", age: 55 },
-    { id: 3, nom: "Maggio", prenom: "Sophie", age: 33 },
-]
+// const personnes = [
+//     { id: 1, nom: "Wick", prenom: "John", age: 45 },
+//     { id: 2, nom: "Dalton", prenom: "Jack", age: 55 },
+//     { id: 3, nom: "Maggio", prenom: "Sophie", age: 33 },
+// ]
 
 const showPersonnes = (req, res, next) => {
-    res.render('personne', {
-        personnes,
-        erreurs: null
+    const SELECT = "SELECT * FROM personnes"
+    const query = connection.query(SELECT, (error, resultat) => {
+        console.log(query.sql);
+        if (resultat) {
+            res.render('personne', {
+                personnes: resultat,
+                erreurs: null
+            })
+        }
     })
+
+
+
 }
 const addPersonne = (req, res, next) => {
 
