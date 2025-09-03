@@ -1,11 +1,5 @@
-import * as yup from 'yup'
-import { fr } from 'yup-locales'
-import connection from '../config/db.js'
+import yup from '../config/yup.config.js'
 import personneRepository from '../repositories/personne.repository.js'
-
-yup.setLocale(fr)
-
-
 
 const personneSchema = yup.object().shape({
     nom: yup
@@ -23,14 +17,12 @@ const personneSchema = yup.object().shape({
 
 })
 
-
-
 const show = async (req, res, next) => {
     const personnes = await personneRepository.findAll()
     if (personnes) {
         res.render('personne', {
-            "personnes": personnes,
-            "erreurs": null
+            personnes,
+            erreurs: null
         })
     } else {
         res.render('personne', {
@@ -40,7 +32,7 @@ const show = async (req, res, next) => {
 
     }
 }
-const add = (req, res, next) => {
+const add = async (req, res, next) => {
 
     personneSchema
         .validate(req.body, { abortEarly: false })
@@ -48,20 +40,22 @@ const add = (req, res, next) => {
             req.session.firstname = req.body.prenom
             const p = await personneRepository.save(req.body)
             if (p == null) {
+                const personnes = await personneRepository.findAll()
                 res.render('personne', {
                     erreurs: ["Problème d'insertion"],
-                    personnes: personneRepository.findAll()
+                    personnes
                 })
             } else {
                 console.log(p);
                 res.redirect('/personne')
             }
         })
-        .catch(err => {
+        .catch(async err => {
             console.log(err);
+            const personnes = await personneRepository.findAll()
             res.render('personne', {
                 erreurs: err.errors,
-                personnes: personneRepository.findAll()
+                personnes
             })
         })
 
@@ -73,5 +67,7 @@ const remove = async (req, res, next) => {
     await personneRepository.deleteById(id)
     res.redirect('/personne')
 }
+
+
 
 export default { show, add, remove }
